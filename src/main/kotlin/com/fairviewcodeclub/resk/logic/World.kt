@@ -11,7 +11,7 @@ class World(val size: Int, val colors: Array<ReskColor>) {
 
     init {
         for (node in this.nodes) {
-            val adjacencies = arrayOf(
+            arrayOf(
                     node.index - this.size,
                     node.index + this.size,
                     node.index - 1,
@@ -21,6 +21,10 @@ class World(val size: Int, val colors: Array<ReskColor>) {
                         this.connections.add(Connection(node.index, it))
                     }
         }
+    }
+
+    fun getAdjacencies(index: Int): List<Int> {
+        return this.connections.mapNotNull { it.other(index) }
     }
 
 }
