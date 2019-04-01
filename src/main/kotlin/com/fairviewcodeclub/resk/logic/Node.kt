@@ -5,7 +5,7 @@ package com.fairviewcodeclub.resk.logic
  */
 class Node(val index: Int) {
 
-    var troops = 0
-    var owner: ReskColor? = null
+	//The troops that currently on this tile
+    var troops: Troops? = null
 
 }
