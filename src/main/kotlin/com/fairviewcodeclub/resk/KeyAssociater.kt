@@ -7,10 +7,10 @@ import com.fairviewcodeclub.resk.logic.ReskColor
  */
 fun getColorOfKey(key: String): ReskColor? {
     return when (key) {
-        System.getenv()["GREEN_PASSWORD"] -> ReskColor.ALIEN_ARMPIT
-        System.getenv()["BLUE_PASSWORD"] -> ReskColor.GLAUCOUS
-        System.getenv()["YELLOW_PASSWORD"] -> ReskColor.MIKADO
-        System.getenv()["RED_PASSWORD"] -> ReskColor.FALU
+		System.getenv()["RED_PASSWORD"] -> ReskColor.RED
+		System.getenv()["BLUE_PASSWORD"] -> ReskColor.BLUE
+		System.getenv()["GREEN_PASSWORD"] -> ReskColor.GREEN
+		System.getenv()["YELLOW_PASSWORD"] -> ReskColor.YELLOW
         else -> null
     }
 }
