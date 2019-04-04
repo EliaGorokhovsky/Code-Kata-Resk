@@ -22,7 +22,14 @@ class World(val size: Int, val colors: Array<ReskColor>) {
 	 * Nodes are given and returned as indices
 	 */
     fun getAdjacencies(index: Int): List<Int> {
-        return this.connections.mapNotNull { it.connects(index) }
+        return this.connections.mapNotNull { it.connects(index) }.distinct()
     }
+
+	/**
+	 * Gets the map as a JSON string
+	 */
+	override fun toString() : String {
+		return "[${this.nodes.joinToString(",") { node -> "{number:${node.index},connectedTo:[${this.getAdjacencies(node.index).joinToString(",")}]}" }}}]"
+	}
 
 }
