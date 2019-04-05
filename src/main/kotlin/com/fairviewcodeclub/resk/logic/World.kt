@@ -28,6 +28,7 @@ class World(val size: Int, val colors: Array<ReskColor>) {
 	/**
 	 * Gets the map as a JSON string
 	 */
+	@Deprecated("Method call is too expensive to be used as a common bread and butter API call")
 	override fun toString() : String {
 		return "[${this.nodes.joinToString(",") { node -> "{number:${node.index},connectedTo:[${this.getAdjacencies(node.index).joinToString(",")}]}" }}}]"
 	}
