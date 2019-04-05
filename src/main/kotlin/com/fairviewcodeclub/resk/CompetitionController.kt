@@ -34,13 +34,13 @@ class CompetitionController {
 	}
 
 	/**
-	 * Gets the amount of tiles the given team color owns
+	 * Gets the tile IDs for tiles owned by the given team color
 	 * If the given team color doesn't exist, null is returned
 	 */
 	@RequestMapping(value=["/teams/numberOfTerritories"], method=[RequestMethod.GET])
 	fun getNumberOfTerritoriesFor(@RequestParam teamColor: String): String {
 		val color = this.world.colors.firstOrNull { it.name == teamColor } ?: return "null"
-		return "${this.world.amountOfTerritoriesFor(color)}"
+		return "[${this.world.territoriesOwnedBy(color).joinToString(",")}]"
 	}
 
 	/**

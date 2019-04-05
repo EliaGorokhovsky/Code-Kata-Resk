@@ -25,10 +25,10 @@ class World(val size: Int, val colors: Array<ReskColor>) {
 	var numberOfTroopsToCommit = 25
 
 	/**
-	 * Gets the amount of territories owned by the given actor
+	 * Gets the IDs of the territories owned by the given actor
 	 */
-	fun amountOfTerritoriesFor(actor: ReskColor): Int {
-		return this.nodes.count { it.troops?.owner == actor }
+	fun territoriesOwnedBy(actor: ReskColor): List<Int> {
+		return this.nodes.filter { it.troops?.owner == actor }.map { it.id }
 	}
 
 	/**
