@@ -16,6 +16,8 @@ class World(val size: Int, val colors: Array<ReskColor>) {
 						.filter { 0 <= it && it < this.nodes.size * this.nodes.size }
 						.map { Connection(it, node.index) }
 			}.toMutableSet()
+	//A map of player colors to the amount of card cash they have; each player starts off with 6 default
+	val cardCashValues = this.colors.map { it to 6 }.toMap()
 
 	/**
 	 * Gets a list of nodes adjacent to the given node

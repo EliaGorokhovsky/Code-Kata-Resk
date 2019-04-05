@@ -42,4 +42,14 @@ class CompetitionController {
 		return "${this.world.nodes[id].troops}"
 	}
 
+	/**
+	 * Gets the amount of available card cash for the team with the given name
+	 * If the given team color doesn't exist, null is returned
+	 */
+	@RequestMapping(value=["/cards/amount"], method=[RequestMethod.GET])
+	fun getAvailableCards(@RequestParam teamColor: String): String {
+		val color = ReskColor.values().firstOrNull { it.name == teamColor } ?: return "null"
+		return "${this.world.cardCashValues[color]}"
+	}
+
 }
