@@ -19,6 +19,18 @@ class World(val size: Int, val colors: Array<ReskColor>) {
 	//A map of player colors to the amount of card cash they have; each player starts off with 6 default
 	val cardCashValues = this.colors.map { it to 6 }.toMap().toMutableMap()
 
+	//The team whose turn it is right now
+	val currentActor = this.colors[0]
+	//How many troops the current actor still has to commit
+	var numberOfTroopsToCommit = 25
+
+	/**
+	 * Gets the amount of territories owned by the given actor
+	 */
+	fun amountOfTerritoriesFor(actor: ReskColor): Int {
+		return this.nodes.count { it.troops?.owner == actor }
+	}
+
 	/**
 	 * Gets a list of nodes adjacent to the given node
 	 * Nodes are given and returned as indices
@@ -32,24 +44,16 @@ class World(val size: Int, val colors: Array<ReskColor>) {
 	 * Teams must own both tiles they are connecting
 	 * Returns the success of using up a card to do the connection action
 	 */
-	fun cardConnect(actor: ReskColor, tileId1: Int, tileId2: Int): Boolean {
-		val cardCashAmount = this.cardCashValues[actor]!!
+	fun cardConnect(tileId1: Int, tileId2: Int): Boolean {
+		val cardCashAmount = this.cardCashValues[this.currentActor]!!
 		val tileOwner1 = this.nodes[tileId1].troops?.owner
 		val tileOwner2 = this.nodes[tileId2].troops?.owner
-		if (cardCashAmount < 1 || this.getAdjacencies(tileId1).contains(tileId2) || tileOwner1 != tileOwner2 || actor != tileOwner1) {
+		if (cardCashAmount < 1 || this.getAdjacencies(tileId1).contains(tileId2) || tileOwner1 != tileOwner2 || this.currentActor != tileOwner1) {
 			return false
 		}
-		this.cardCashValues[actor] = cardCashAmount - 1
+		this.cardCashValues[this.currentActor] = cardCashAmount - 1
 		this.connections.add(Connection(tileId1, tileId2))
 		return true
-	}
-
-	/**
-	 * Gets the map as a JSON string
-	 */
-	@Deprecated("Method call is too expensive to be used as a common bread and butter API call")
-	override fun toString() : String {
-		return "[${this.nodes.joinToString(",") { node -> "{number:${node.id},connectedTo:[${this.getAdjacencies(node.id).joinToString(",")}]}" }}}]"
 	}
 
 }
