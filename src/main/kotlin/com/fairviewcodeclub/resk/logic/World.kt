@@ -19,10 +19,33 @@ class World(val size: Int, val colors: Array<ReskColor>) {
 	//A map of player colors to the amount of card cash they have; each player starts off with 6 default
 	val cardCashValues = this.colors.map { it to 6 }.toMap().toMutableMap()
 
+	//How many turns this world has existed
+	var turnCount = 0
 	//The team whose turn it is right now
 	val currentActor = this.colors[0]
 	//How many troops the current actor still has to commit
 	var numberOfTroopsToCommit = 25
+
+	/**
+	 * Commits the given amount of troops to the given location
+	 * Troops can only be committed to owned tiles or a corner of the map if no tiles are owned
+	 * Player's turn is over once all troops are committed
+	 * This method handles managing turn count and current player
+	 * Returns method success
+	 */
+	fun commitNewTroops(locationId: Int, amount: Int): Boolean {
+		if (this.nodes[locationId].troops?.owner != this.currentActor && !arrayOf(0, size - 1, size * (size - 1), size * size - 1).contains(locationId)) {
+			return false
+		}
+		if (amount > this.numberOfTroopsToCommit) {
+			return false
+		}
+		this.nodes[locationId].addTroops(Troops(this.currentActor, amount))
+		if (this.numberOfTroopsToCommit == 0) {
+			//TODO: initiate new turn
+		}
+		return true
+	}
 
 	/**
 	 * Gets the IDs of the territories owned by the given actor
