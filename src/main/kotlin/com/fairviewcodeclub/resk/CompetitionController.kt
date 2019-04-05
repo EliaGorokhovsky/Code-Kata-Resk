@@ -48,8 +48,20 @@ class CompetitionController {
 	 */
 	@RequestMapping(value=["/cards/amount"], method=[RequestMethod.GET])
 	fun getAvailableCards(@RequestParam teamColor: String): String {
-		val color = ReskColor.values().firstOrNull { it.name == teamColor } ?: return "null"
+		val color = this.world.colors.firstOrNull { it.name == teamColor } ?: return "null"
 		return "${this.world.cardCashValues[color]}"
+	}
+
+	/**
+	 * Allows a team to spend 1 card cash to connect 2 tiles together
+	 * If the team password is wrong, null is returned
+	 * If the connection already exists or the team doesn't have enough card cash, false is returned
+	 * If the connection was successfully made, true is returned
+	 */
+	@RequestMapping(value=["/cards/connect"], method=[RequestMethod.PUT])
+	fun connectTiles(@RequestParam teamPassword: String, @RequestParam tileId1: Int, @RequestParam tileId2: Int): String {
+		val team = getColorOfKey(teamPassword) ?: return "null"
+		return "${this.world.cardConnect(team, tileId1, tileId2)}"
 	}
 
 }

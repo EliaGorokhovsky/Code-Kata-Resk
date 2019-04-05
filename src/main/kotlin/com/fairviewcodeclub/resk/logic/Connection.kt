@@ -9,8 +9,8 @@ package com.fairviewcodeclub.resk.logic
 class Connection(val node1: Int, val node2: Int) {
 
 	/**
-	 * Returns the other node of the connection if the given index is connected by this connection
-	 * Returns null if the given index isn't a part of this connection
+	 * Returns the other node of the connection if the given id is connected by this connection
+	 * Returns null if the given id isn't a part of this connection
 	 */
 	fun connects(index: Int): Int? {
 		return if (this.node1 == index) this.node2 else if (this.node2 == index) this.node1 else null
