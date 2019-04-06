@@ -59,13 +59,21 @@ class World(val size: Int, val colors: Array<ReskColor>) {
 				}
 			}
 			this.troopOrders.clear()
-			this.currentActor = this.colors[(this.colors.indexOf(this.currentActor) + 1) % this.colors.size]
+			fun incrementCurrentActor() {
+				this.currentActor = this.colors[(this.colors.indexOf(this.currentActor) + 1) % this.colors.size]
+			}
+			incrementCurrentActor()
 			if (this.currentActor == this.colors[0]) {
 				this.turnCount++
 			}
-			this.numberOfTroopsToCommit = this.territoriesOwnedBy(this.currentActor).size
 			if (this.turnCount == 0) {
 				this.numberOfTroopsToCommit = 25
+			} else {
+				val eliminatedPlayers = this.colors.filter { this.territoriesOwnedBy(it).isEmpty() }
+				while (eliminatedPlayers.contains(this.currentActor)) {
+					incrementCurrentActor()
+				}
+				this.numberOfTroopsToCommit = this.territoriesOwnedBy(this.currentActor).size
 			}
 		}
 		return true
