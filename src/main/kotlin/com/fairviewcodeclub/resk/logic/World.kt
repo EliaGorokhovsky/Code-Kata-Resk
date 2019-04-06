@@ -22,9 +22,11 @@ class World(val size: Int, val colors: Array<ReskColor>) {
 	//How many turns this world has existed
 	var turnCount = 0
 	//The team whose turn it is right now
-	val currentActor = this.colors[0]
+	var currentActor = this.colors[0]
 	//How many troops the current actor still has to commit
 	var numberOfTroopsToCommit = 25
+	//What troop orders will execute at the end of the current turn
+	val troopOrders = mutableListOf<TroopOrder>()
 
 	/**
 	 * Commits the given amount of troops to the given location
@@ -34,15 +36,32 @@ class World(val size: Int, val colors: Array<ReskColor>) {
 	 * Returns method success
 	 */
 	fun commitNewTroops(locationId: Int, amount: Int): Boolean {
-		if (this.nodes[locationId].troops?.owner != this.currentActor && !arrayOf(0, size - 1, size * (size - 1), size * size - 1).contains(locationId)) {
+		if (amount > this.numberOfTroopsToCommit || amount == 0) {
 			return false
 		}
-		if (amount > this.numberOfTroopsToCommit) {
+		if (this.nodes[locationId].troops?.owner != this.currentActor || this.territoriesOwnedBy(this.currentActor).isEmpty() && !arrayOf(0, size - 1, size * (size - 1), size * size - 1).contains(locationId)) {
 			return false
 		}
-		this.nodes[locationId].addTroops(Troops(this.currentActor, amount))
+		this.troopOrders.add(TroopOrder(-1, locationId, amount))
+		this.numberOfTroopsToCommit -= amount
 		if (this.numberOfTroopsToCommit == 0) {
-			//TODO: initiate new turn
+			this.troopOrders.forEach { troopOrder ->
+				if (troopOrder.fromId == -1) {
+					this.nodes[troopOrder.toId].addTroops(Troops(this.currentActor, troopOrder.amount))
+				} else {
+					this.nodes[troopOrder.fromId].addTroops(Troops(this.currentActor, -troopOrder.amount))
+					this.nodes[troopOrder.toId].addTroops(Troops(this.currentActor, troopOrder.amount))
+				}
+			}
+			this.troopOrders.clear()
+			this.currentActor = this.colors[(this.colors.indexOf(this.currentActor) + 1) % this.colors.size]
+			if (this.currentActor == this.colors[0]) {
+				this.turnCount++
+			}
+			this.numberOfTroopsToCommit = this.territoriesOwnedBy(this.currentActor).size
+			if (this.turnCount == 0) {
+				this.numberOfTroopsToCommit = 25
+			}
 		}
 		return true
 	}

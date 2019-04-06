@@ -38,7 +38,7 @@ class CompetitionController {
 	 * If the given team color doesn't exist, null is returned
 	 */
 	@RequestMapping(value=["/teams/numberOfTerritories"], method=[RequestMethod.GET])
-	fun getNumberOfTerritoriesFor(@RequestParam teamColor: String): String {
+	fun getTerritoriesFor(@RequestParam teamColor: String): String {
 		val color = this.world.colors.firstOrNull { it.name == teamColor } ?: return "null"
 		return "[${this.world.territoriesOwnedBy(color).joinToString(",")}]"
 	}
