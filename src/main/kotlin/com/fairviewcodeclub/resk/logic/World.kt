@@ -5,7 +5,7 @@ package com.fairviewcodeclub.resk.logic
  * A world is a mathematical graph of nodes and edges
  * World constructor takes in sidelength and the colors of the playing players
  */
-class World(val size: Int, val colors: Array<ReskColor>) {
+class World(val size: Int, var colors: Array<ReskColor>) {
 
 	//The nodes or tiles of the world
     val nodes = Array(this.size * this.size) { Node(it) }
@@ -47,18 +47,19 @@ class World(val size: Int, val colors: Array<ReskColor>) {
 		if (this.numberOfTroopsToCommit == 0) {
 			this.troopOrders.forEach { troopOrder ->
 				val previousTileOwner = this.nodes[troopOrder.toId].troops?.owner
-				if (troopOrder.fromId == -1) {
-					this.nodes[troopOrder.toId].addTroops(Troops(this.currentActor, troopOrder.amount))
-				} else {
-					this.nodes[troopOrder.fromId].addTroops(Troops(this.currentActor, -troopOrder.amount))
-					this.nodes[troopOrder.toId].addTroops(Troops(this.currentActor, troopOrder.amount))
-				}
-				if (previousTileOwner != this.currentActor && this.nodes[troopOrder.toId].troops?.owner == this.currentActor) {
-					val previousCardCash = this.cardCashValues[this.currentActor]!!
-					this.cardCashValues[this.currentActor] = previousCardCash + 1
+				this.nodes[troopOrder.toId].addTroops(Troops(this.currentActor, troopOrder.amount))
+				if (this.nodes[troopOrder.toId].troops?.owner == this.currentActor) {
+					if (troopOrder.fromId != -1) {
+						this.nodes[troopOrder.fromId].addTroops(Troops(this.currentActor, -troopOrder.amount))
+					}
+					if (previousTileOwner != this.currentActor) {
+						val previousCardCash = this.cardCashValues[this.currentActor]!!
+						this.cardCashValues[this.currentActor] = previousCardCash + 1
+					}
 				}
 			}
 			this.troopOrders.clear()
+			this.nodes.filter { it.troops != null && it.troops!!.amount <= 0 }.forEach { it.troops = null }
 			fun incrementCurrentActor() {
 				this.currentActor = this.colors[(this.colors.indexOf(this.currentActor) + 1) % this.colors.size]
 			}
@@ -73,6 +74,7 @@ class World(val size: Int, val colors: Array<ReskColor>) {
 				while (eliminatedPlayers.contains(this.currentActor)) {
 					incrementCurrentActor()
 				}
+				this.colors = this.colors.filter { !eliminatedPlayers.contains(it) }.toTypedArray()
 				this.numberOfTroopsToCommit = this.territoriesOwnedBy(this.currentActor).size
 			}
 		}

@@ -18,7 +18,16 @@ class Node(val id: Int) {
 			this.troops == null -> this.troops = newTroops
 			this.troops!!.owner == newTroops.owner -> this.troops = Troops(newTroops.owner, this.troops!!.amount + newTroops.amount)
 			else -> {
-				//TODO: do attacking
+				val defenseForce = this.troops!!
+				this.troops = Troops(defenseForce.owner, defenseForce.amount - 3 * newTroops.amount / 4)
+				newTroops.amount -= defenseForce.amount / 2
+				if (this.troops!!.amount <= 0) {
+					if (newTroops.amount > 0) {
+						this.troops = newTroops
+					} else {
+						this.troops = null
+					}
+				}
 			}
 		}
 	}
