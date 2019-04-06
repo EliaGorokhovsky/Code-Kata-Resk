@@ -46,11 +46,16 @@ class World(val size: Int, val colors: Array<ReskColor>) {
 		this.numberOfTroopsToCommit -= amount
 		if (this.numberOfTroopsToCommit == 0) {
 			this.troopOrders.forEach { troopOrder ->
+				val previousTileOwner = this.nodes[troopOrder.toId].troops?.owner
 				if (troopOrder.fromId == -1) {
 					this.nodes[troopOrder.toId].addTroops(Troops(this.currentActor, troopOrder.amount))
 				} else {
 					this.nodes[troopOrder.fromId].addTroops(Troops(this.currentActor, -troopOrder.amount))
 					this.nodes[troopOrder.toId].addTroops(Troops(this.currentActor, troopOrder.amount))
+				}
+				if (previousTileOwner != this.currentActor && this.nodes[troopOrder.toId].troops?.owner == this.currentActor) {
+					val previousCardCash = this.cardCashValues[this.currentActor]!!
+					this.cardCashValues[this.currentActor] = previousCardCash + 1
 				}
 			}
 			this.troopOrders.clear()

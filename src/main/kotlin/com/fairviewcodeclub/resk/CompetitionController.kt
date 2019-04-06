@@ -37,7 +37,7 @@ class CompetitionController {
 	 * Gets the tile IDs for tiles owned by the given team color
 	 * If the given team color doesn't exist, null is returned
 	 */
-	@RequestMapping(value=["/teams/numberOfTerritories"], method=[RequestMethod.GET])
+	@RequestMapping(value=["/teams/territories"], method=[RequestMethod.GET])
 	fun getTerritoriesFor(@RequestParam teamColor: String): String {
 		val color = this.world.colors.firstOrNull { it.name == teamColor } ?: return "null"
 		return "[${this.world.territoriesOwnedBy(color).joinToString(",")}]"
@@ -66,6 +66,22 @@ class CompetitionController {
 	@RequestMapping(value=["/board/troops"], method=[RequestMethod.GET])
 	fun getTroopsOnTile(@RequestParam id: Int): String {
 		return "${this.world.nodes[id].troops}"
+	}
+
+	/**
+	 * Allows the team of the given password to commit troops to an owned tile if it is their turn
+	 * Returns null if the password is wrong or the team isn't allowed to commit troops yet
+	 * Returns success of adding new troops
+	 * Troops don't get added immediately: action of adding troops is queued until the end of the turn
+	 * Turn ends once a team commits all of their troops
+	 */
+	@RequestMapping(value=["/troops/add"], method=[RequestMethod.POST])
+	fun addTroopsTo(@RequestParam teamPassword: String, @RequestParam locationId: Int, @RequestParam amount: Int): String {
+		val team = getColorOfKey(teamPassword) ?: return "null"
+		if (this.world.currentActor != team) {
+			return "null"
+		}
+		return "${this.world.commitNewTroops(locationId, amount)}"
 	}
 
 	/**
