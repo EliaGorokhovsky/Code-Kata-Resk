@@ -164,7 +164,7 @@ class World(val size: Int, colors: Array<ReskColor>) {
 	 */
 	@Synchronized fun cardDisconnect(tileId: Int): Boolean {
 		val cardCashAmount = this.cardCashValues[this.currentActor]!!
-		if (cardCashAmount < 4) {
+		if (cardCashAmount < 4 || this.getAdjacencies(tileId).isEmpty()) {
 			return false
 		}
 		this.cardCashValues[this.currentActor] = cardCashAmount - 4

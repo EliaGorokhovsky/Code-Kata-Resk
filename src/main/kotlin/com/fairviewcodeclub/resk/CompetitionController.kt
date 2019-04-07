@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController
 
 /**
  * The class that handles managing requests for the competition game
+ * Performs validity checks and passes data to World class
  */
 @RestController
 @RequestMapping(value=["/api"])
@@ -136,6 +137,36 @@ class CompetitionController {
 			return "null"
 		}
 		return "${this.world.cardConnect(tileId1, tileId2)}"
+	}
+
+	/**
+	 * Allows a team to spend 2 card cash to inspire an insurgency on a tile
+	 * If the team password is wrong or the team is not yet allowed to play or the tile ID is wrong, null is returned
+	 * See documentation for World.inspireInsurgency
+	 * Success is returned as true; false is only returned if there is not enough money to inspire an insurgency
+	 */
+	@RequestMapping(value=["/cards/inspireInsurgency"], method=[RequestMethod.POST])
+	fun inspireInsurgency(@RequestParam teamPassword: String, @RequestParam tileId: Int): String {
+		val team = getColorOfKey(teamPassword) ?: return "null"
+		if (this.world.currentActor != team || !this.isTileIdValid(tileId)) {
+			return "null"
+		}
+		return "${this.world.cardInspireInsurgency(tileId)}"
+	}
+
+	/**
+	 * Allows a team to spend 4 card cash to remove all connections from a tile
+	 * If the team password is wrong or the team is not yet allowed to play a card or the tile ID is wrong, null is returned
+	 * If the tile is isolated or the team doesn't have enough card cash, false is returned
+	 * True is returned on success
+	 */
+	@RequestMapping(value=["/cards/disconnect"], method=[RequestMethod.PUT])
+	fun disconnectTile(@RequestParam teamPassword: String, @RequestParam tileId: Int): String {
+		val team = getColorOfKey(teamPassword) ?: return "null"
+		if (this.world.currentActor != team || !this.isTileIdValid(tileId)) {
+			return "null"
+		}
+		return "${this.world.cardDisconnect(tileId)}"
 	}
 
 }
