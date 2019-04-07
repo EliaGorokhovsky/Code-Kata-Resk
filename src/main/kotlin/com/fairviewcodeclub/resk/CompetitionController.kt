@@ -18,6 +18,13 @@ class CompetitionController {
 	val world = World(25, ReskColor.values().toList().shuffled().toTypedArray())
 
 	/**
+	 * Returns whether the given tile ID is allowed
+	 */
+	private fun isTileIdValid(tileId: Int): Boolean {
+		return 0 <= tileId && tileId < this.world.size * this.world.size
+	}
+
+	/**
 	 * Gets the order of the teams
 	 */
 	@RequestMapping(value=["/teams/order"], method=[RequestMethod.GET])
@@ -53,24 +60,31 @@ class CompetitionController {
 
 	/**
 	 * Gets the IDs of the tiles that are adjacent to the tile of the given ID
+	 * If the given ID is wrong, null is returned
 	 */
 	@RequestMapping(value=["/board/adjacencies"], method=[RequestMethod.GET])
 	fun getAdjacenciesForTile(@RequestParam id: Int): String {
+		if (!this.isTileIdValid(id)) {
+			return "null"
+		}
 		return "[${this.world.getAdjacencies(id).joinToString(",")}]"
 	}
 
 	/**
 	 * Gets the troops on the tile of the given ID
-	 * null means there are no troops
+	 * null means there are no troops or the tile ID is wrong
 	 */
 	@RequestMapping(value=["/board/troops"], method=[RequestMethod.GET])
 	fun getTroopsOnTile(@RequestParam id: Int): String {
+		if (!this.isTileIdValid(id)) {
+			return "null"
+		}
 		return "${this.world.nodes[id].troops}"
 	}
 
 	/**
 	 * Allows the team of the given password to commit troops to an owned tile if it is their turn
-	 * Returns null if the password is wrong or the team isn't allowed to commit troops yet
+	 * Returns null if the password is wrong or the team isn't allowed to commit troops yet or the tile ID is wrong
 	 * Returns success of adding new troops
 	 * Troops don't get added immediately: action of adding troops is queued until the end of the turn
 	 * Turn ends once a team commits all of their troops
@@ -78,7 +92,7 @@ class CompetitionController {
 	@RequestMapping(value=["/troops/add"], method=[RequestMethod.POST])
 	fun addTroopsTo(@RequestParam teamPassword: String, @RequestParam locationId: Int, @RequestParam amount: Int): String {
 		val team = getColorOfKey(teamPassword) ?: return "null"
-		if (this.world.currentActor != team) {
+		if (this.world.currentActor != team || !this.isTileIdValid(locationId)) {
 			return "null"
 		}
 		return "${this.world.commitNewTroops(locationId, amount)}"
@@ -86,14 +100,14 @@ class CompetitionController {
 
 	/**
 	 * Allows the team of the given password to move existing troops to an adjacent or other owned tile
-	 * Returns null if the password is wrong or the team isn't allowed to move troops yet
+	 * Returns null if the password is wrong or the team isn't allowed to move troops yet or any of the given IDs are wrong
 	 * Returns success of moving troops
 	 * Troops don't get moved immediately: action of moving troops is queued until the end of the turn
 	 */
 	@RequestMapping(value=["/troops/move"], method=[RequestMethod.POST])
 	fun moveTroops(@RequestParam teamPassword: String, @RequestParam fromId: Int, @RequestParam toId: Int, @RequestParam amount: Int): String {
 		val team = getColorOfKey(teamPassword) ?: return "null"
-		if (this.world.currentActor != team) {
+		if (this.world.currentActor != team || !this.isTileIdValid(fromId) || !this.isTileIdValid(toId)) {
 			return "null"
 		}
 		return "${this.world.queueTroopsMove(fromId, toId, amount)}"
@@ -111,14 +125,14 @@ class CompetitionController {
 
 	/**
 	 * Allows a team to spend 1 card cash to connect 2 tiles together
-	 * If the team password is wrong or the team is not yet allowed to play a card, null is returned
+	 * If the team password is wrong or the team is not yet allowed to play a card or any IDs are wrong, null is returned
 	 * If the connection already exists or the team doesn't have enough card cash, false is returned
 	 * If the connection was successfully made, true is returned
 	 */
 	@RequestMapping(value=["/cards/connect"], method=[RequestMethod.PUT])
 	fun connectTiles(@RequestParam teamPassword: String, @RequestParam tileId1: Int, @RequestParam tileId2: Int): String {
 		val team = getColorOfKey(teamPassword) ?: return "null"
-		if (this.world.currentActor != team) {
+		if (this.world.currentActor != team || !this.isTileIdValid(tileId1) || !this.isTileIdValid(tileId2)) {
 			return "null"
 		}
 		return "${this.world.cardConnect(tileId1, tileId2)}"
