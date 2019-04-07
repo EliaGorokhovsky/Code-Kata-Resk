@@ -84,6 +84,12 @@ class CompetitionController {
 		return "${this.world.commitNewTroops(locationId, amount)}"
 	}
 
+	/**
+	 * Allows the team of the given password to move existing troops to an adjacent or other owned tile
+	 * Returns null if the password is wrong or the team isn't allowed to move troops yet
+	 * Returns success of moving troops
+	 * Troops don't get moved immediately: action of moving troops is queued until the end of the turn
+	 */
 	@RequestMapping(value=["/troops/move"], method=[RequestMethod.POST])
 	fun moveTroops(@RequestParam teamPassword: String, @RequestParam fromId: Int, @RequestParam toId: Int, @RequestParam amount: Int): String {
 		val team = getColorOfKey(teamPassword) ?: return "null"

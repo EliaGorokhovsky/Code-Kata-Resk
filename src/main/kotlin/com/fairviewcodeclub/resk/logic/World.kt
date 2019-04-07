@@ -101,8 +101,14 @@ class World(val size: Int, colors: Array<ReskColor>) {
 	 * Returns success of queueing move order
 	 */
 	@Synchronized fun queueTroopsMove(fromId: Int, toId: Int, amount: Int): Boolean {
-		//TODO:
-		return false
+		if (this.nodes[fromId].troops?.owner != this.currentActor) {
+			return false
+		}
+		if (this.nodes[fromId].troops!!.amount - this.troopOrders.filter { it.fromId == fromId }.sumBy { it.amount } < amount) {
+			return false
+		}
+		this.troopOrders.add(TroopOrder(fromId, toId, amount))
+		return true
 	}
 
 	/**
