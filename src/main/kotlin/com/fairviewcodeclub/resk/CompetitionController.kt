@@ -84,7 +84,7 @@ class CompetitionController {
 
 	/**
 	 * Allows the team of the given password to commit troops to an owned tile if it is their turn
-	 * Returns null if the password is wrong or the team isn't allowed to commit troops yet or the tile ID is wrong
+	 * Returns null if the password is wrong or the team isn't allowed to commit troops yet or the tile ID is wrong or the amount is <= 0
 	 * Returns success of adding new troops
 	 * Troops don't get added immediately: action of adding troops is queued until the end of the turn
 	 * Turn ends once a team commits all of their troops
@@ -92,7 +92,7 @@ class CompetitionController {
 	@RequestMapping(value=["/troops/add"], method=[RequestMethod.POST])
 	fun addTroopsTo(@RequestParam teamPassword: String, @RequestParam locationId: Int, @RequestParam amount: Int): String {
 		val team = getColorOfKey(teamPassword) ?: return "null"
-		if (this.world.currentActor != team || !this.isTileIdValid(locationId)) {
+		if (this.world.currentActor != team || !this.isTileIdValid(locationId) || amount <= 0) {
 			return "null"
 		}
 		return "${this.world.commitNewTroops(locationId, amount)}"
@@ -100,14 +100,14 @@ class CompetitionController {
 
 	/**
 	 * Allows the team of the given password to move existing troops to an adjacent or other owned tile
-	 * Returns null if the password is wrong or the team isn't allowed to move troops yet or any of the given IDs are wrong
+	 * Returns null if the password is wrong or the team isn't allowed to move troops yet or any of the given IDs are wrong or the amount is <= 0
 	 * Returns success of moving troops
 	 * Troops don't get moved immediately: action of moving troops is queued until the end of the turn
 	 */
 	@RequestMapping(value=["/troops/move"], method=[RequestMethod.POST])
 	fun moveTroops(@RequestParam teamPassword: String, @RequestParam fromId: Int, @RequestParam toId: Int, @RequestParam amount: Int): String {
 		val team = getColorOfKey(teamPassword) ?: return "null"
-		if (this.world.currentActor != team || !this.isTileIdValid(fromId) || !this.isTileIdValid(toId)) {
+		if (this.world.currentActor != team || !this.isTileIdValid(fromId) || !this.isTileIdValid(toId) || amount <= 0) {
 			return "null"
 		}
 		return "${this.world.queueTroopsMove(fromId, toId, amount)}"
