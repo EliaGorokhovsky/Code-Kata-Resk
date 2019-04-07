@@ -4,11 +4,13 @@ package com.fairviewcodeclub.resk.logic
  * The object in which the game is played
  * A world is a mathematical graph of nodes and edges
  * World constructor takes in sidelength and the colors of the playing players
+ * All methods are synchronized to prevent threading issues
  */
 class World(val size: Int, var colors: Array<ReskColor>) {
 
 	//The nodes or tiles of the world
     val nodes = Array(this.size * this.size) { Node(it) }
+		@Synchronized get() = field
 	//The paths between nodes: which tiles connect to which other tiles
     val connections = this.nodes
 			.flatMap { node ->
@@ -16,17 +18,23 @@ class World(val size: Int, var colors: Array<ReskColor>) {
 						.filter { 0 <= it && it < this.nodes.size * this.nodes.size }
 						.map { Connection(it, node.id) }
 			}.toMutableSet()
+		@Synchronized get() = field
 	//A map of player colors to the amount of card cash they have; each player starts off with 6 default
 	val cardCashValues = this.colors.map { it to 6 }.toMap().toMutableMap()
+		@Synchronized get() = field
 
 	//How many turns this world has existed
 	var turnCount = 0
+		@Synchronized get() = field
 	//The team whose turn it is right now
 	var currentActor = this.colors[0]
+		@Synchronized get() = field
 	//How many troops the current actor still has to commit
 	var numberOfTroopsToCommit = 25
+		@Synchronized get() = field
 	//What troop orders will execute at the end of the current turn
 	val troopOrders = mutableListOf<TroopOrder>()
+		@Synchronized get() = field
 
 	/**
 	 * Commits the given amount of troops to the given location
@@ -35,7 +43,7 @@ class World(val size: Int, var colors: Array<ReskColor>) {
 	 * This method handles managing turn count and current player
 	 * Returns method success
 	 */
-	fun commitNewTroops(locationId: Int, amount: Int): Boolean {
+	@Synchronized fun commitNewTroops(locationId: Int, amount: Int): Boolean {
 		if (amount > this.numberOfTroopsToCommit || amount == 0) {
 			return false
 		}
@@ -84,7 +92,7 @@ class World(val size: Int, var colors: Array<ReskColor>) {
 	/**
 	 * Gets the IDs of the territories owned by the given actor
 	 */
-	fun territoriesOwnedBy(actor: ReskColor): List<Int> {
+	@Synchronized fun territoriesOwnedBy(actor: ReskColor): List<Int> {
 		return this.nodes.filter { it.troops?.owner == actor }.map { it.id }
 	}
 
@@ -92,7 +100,7 @@ class World(val size: Int, var colors: Array<ReskColor>) {
 	 * Gets a list of nodes adjacent to the given node
 	 * Nodes are given and returned as indices
 	 */
-    fun getAdjacencies(tileId: Int): List<Int> {
+	@Synchronized fun getAdjacencies(tileId: Int): List<Int> {
         return this.connections.mapNotNull { it.connects(tileId) }.distinct()
     }
 
@@ -101,7 +109,7 @@ class World(val size: Int, var colors: Array<ReskColor>) {
 	 * Teams must own both tiles they are connecting
 	 * Returns the success of using up a card to do the connection action
 	 */
-	fun cardConnect(tileId1: Int, tileId2: Int): Boolean {
+	@Synchronized fun cardConnect(tileId1: Int, tileId2: Int): Boolean {
 		val cardCashAmount = this.cardCashValues[this.currentActor]!!
 		val tileOwner1 = this.nodes[tileId1].troops?.owner
 		val tileOwner2 = this.nodes[tileId2].troops?.owner
