@@ -9,6 +9,7 @@ We've also spiced up the game a little by adding cards: players earn card cash b
  * Connect two owned tiles so that troops can move between them in one turn;
  * "Create an insurgency": place 10 unowned troops on an unowned tile, or attack an owned tile with 10 owned troops;
  * Remove all connections to an owned tile, essentially removing it from the game.
+
 The game is played on a grid of size 25x25 where each player starts in one of the corners.
 Each tile is connected at first to all tiles directly adjacent to it (not diagonals), but can be connected to other tiles with the connect card.
 In order for each side to control their empire, they must call the API methods described below. 
@@ -51,7 +52,7 @@ This call will return a list of the IDs for all tiles that are connected to the 
 ```GET URL/board/troops - params(id: Int)```
 
 This call will return a Javascript object containing the owner of the territory with given ID and the number of troops in that territory.
-Unowned territories have `owner: null`. For example, an output might look like this: `{owner:YELLOW, amount:2}`.
+Unowned territories have `owner: null` if they have troops, but will only return `null` if they are unoccupied. For example, an output might look like this: `{owner:YELLOW, amount:2}`.
 
 ```GET URL/actions```
 
@@ -96,12 +97,8 @@ Expends 1 card cash to create a connection between `tileId1` and `tileId2` provi
 ```POST URL/cards/inspireInsurgency - params(teamPassword: String, tileId: Int)```
 
 Expends 2 card cash to place 10 unowned troops on the territory with ID `tileId`. 
-If the territory is owned, the unowned troops will instead attack the territory (in other words, the territory loses 7 troops, and if it becomes unowned and any unowned troops remain.)
+If the territory is owned, the unowned troops will instead attack the territory (in other words, the territory loses 7 troops, and if it becomes unowned any unowned troops remain.)
 
 ```PUT URL/cards/disconnect - params(teamPassword: String, tileId: Int)```
 
-Expends 4 card cash to remove all connections to the tile with ID `tileId`, provided you own it.
-
-
-
- 
+Expends 4 card cash to remove all connections to the tile with ID `tileId`.
