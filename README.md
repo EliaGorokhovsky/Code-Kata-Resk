@@ -26,7 +26,7 @@ To see a live version of a test environment, go to `URL/test?key=TEAM_KEY` to se
 
 ## Actions 
 
-The `URL` in the following examples is either `localhost:8080/api` or `codekataresk.herokuapp.com/api` depending on whether the game is in the test environment or in competition.
+The `URL` in the following examples is either `localhost:8080/api` or `code-kata-resk.herokuapp.com/api` depending on whether the game is in the test environment or in competition.
  
 ### Information
  
