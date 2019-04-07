@@ -102,3 +102,11 @@ If the territory is owned, the unowned troops will instead attack the territory 
 ```PUT URL/cards/disconnect - params(teamPassword: String, tileId: Int)```
 
 Expends 4 card cash to remove all connections to the tile with ID `tileId`.
+
+## Test Environment
+
+Each team can access a test environment where they are the only player. 
+The test environment can be accessed using any of the above API calls with `URL/api` as `URL/test/api`.
+Any API call in a test environment needs to have `teamPassword` as a parameter, even if it doesn't do so in the documentation.
+A team can also reset its test environment using the call
+```POST URL/test/api - params(teamPassword: String)```
