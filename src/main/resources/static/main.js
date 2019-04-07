@@ -38,7 +38,7 @@ window.setInterval(async () => {
 	const nodes = [];
 
 	for (let i = 0; i < 25 * 25; i++) {
-		nodes.push({ id: i, color: "white", connections: await JSON.parse(await (await fetch(`${window.location.href.split("?")[0]}/api/board/adjacencies?id=${i}`)).text()) });
+		nodes.push({ id: i, color: "white", numberOfTroops: 0, connections: await JSON.parse(await (await fetch(`${window.location.href.split("?")[0]}/api/board/adjacencies?id=${i}`)).text()) });
 		let owner = Object.keys(ownedTerritories).find(color => ownedTerritories[color].includes(i));
 		if (owner) {
 			nodes[i].color = owner.toLowerCase();
@@ -73,6 +73,8 @@ window.setInterval(async () => {
 		renderer.closePath();
 		renderer.fill();
 		renderer.stroke();
+		renderer.fillStyle = "black";
+		renderer.fillText(`${node.numberOfTroops}`, getLocationOf(node.id)[0] - nodeRadius / 4, getLocationOf(node.id)[1] + nodeRadius / 4, 2 * nodeRadius)
 	}
 
 }, 5000);

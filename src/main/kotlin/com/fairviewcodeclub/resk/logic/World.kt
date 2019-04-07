@@ -24,8 +24,8 @@ class World(val size: Int, colors: Array<ReskColor>) {
 				}.filter { 0 <= it && it < this.size * this.size }.map { Connection(it, node.id) }
 			}.toMutableSet()
 		@Synchronized get() = field
-	//A map of player colors to the amount of card cash they have; each player starts off with 6 default
-	val cardCashValues = colors.map { it to 6 }.toMap().toMutableMap()
+	//A map of player colors to the amount of card cash they have; each player starts off with 0 default
+	val cardCashValues = colors.map { it to 0 }.toMap().toMutableMap()
 		@Synchronized get() = field
 
 	//How many turns this world has existed
@@ -99,7 +99,7 @@ class World(val size: Int, colors: Array<ReskColor>) {
 
 	/**
 	 * Adds a TroopOrder to move the given amount of troops from the fromId tile to the toId tile
-	 * Troops can only be moved to adjacent tiles or to other owned tiles
+	 * Troops can only be moved to adjacent tiles
 	 * Returns success of queueing move order
 	 */
 	@Synchronized fun queueTroopsMove(fromId: Int, toId: Int, amount: Int): Boolean {
@@ -107,6 +107,9 @@ class World(val size: Int, colors: Array<ReskColor>) {
 			return false
 		}
 		if (this.nodes[fromId].troops!!.amount - this.troopOrders.filter { it.fromId == fromId }.sumBy { it.amount } < amount) {
+			return false
+		}
+		if (!this.getAdjacencies(fromId).contains(toId)) {
 			return false
 		}
 		this.troopOrders.add(TroopOrder(fromId, toId, amount))
