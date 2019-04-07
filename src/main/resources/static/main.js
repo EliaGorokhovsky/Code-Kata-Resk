@@ -24,10 +24,9 @@ window.onload = () => {
 };
 
 /**
- * Repeatedly draws the game every second
+ * Repeatedly draws the game
  */
-window.setInterval(async () => {
-
+async function main() {
 	const players = await JSON.parse(await (await fetch(`${window.location.href.split("?")[0]}/api/teams/order`)).text());
 	const ownedTerritories = {};
 	for (i in players) {
@@ -55,7 +54,7 @@ window.setInterval(async () => {
 
 	const insurgencies = [];
 	const log = await JSON.parse(await (await fetch(`${window.location.href.split("?")[0]}/api/actions`)).text());
-	log.filter(line => line.startsWith("insurgency")).forEach(line => {
+	log.filter(line => line.split(" ").length === 3 && line.split(" ")[1] === "insurgency").forEach(line => {
 		const tile = parseInt(line.split(" ")[1]);
 		if (!insurgencies.includes(tile)) {
 			insurgencies.push(tile);
@@ -101,4 +100,6 @@ window.setInterval(async () => {
 		renderer.fillText(`${node.numberOfTroops}`, getLocationOf(node.id)[0] - nodeRadius / 4, getLocationOf(node.id)[1] + nodeRadius / 4, 2 * nodeRadius)
 	}
 
-}, 5000);
+	main();
+}
+main();
