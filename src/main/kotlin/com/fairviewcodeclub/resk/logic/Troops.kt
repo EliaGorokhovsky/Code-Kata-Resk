@@ -6,7 +6,7 @@ package com.fairviewcodeclub.resk.logic
 data class Troops(val owner: ReskColor?, var amount: Int) {
 
 	override fun toString(): String {
-		return "{owner:${this.owner?.name},amount:${this.amount}}"
+		return "{owner:\"${this.owner?.name}\",amount:${this.amount}}"
 	}
 
 }

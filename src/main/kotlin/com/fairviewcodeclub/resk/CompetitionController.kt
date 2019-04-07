@@ -32,7 +32,7 @@ class CompetitionController {
 	 */
 	@RequestMapping(value=["/teams/order"], method=[RequestMethod.GET])
 	fun getPlayerOrder(): String {
-		return "[${this.world.players.joinToString(",") { it.name }}]"
+		return "[${this.world.players.joinToString(",") { "\"${it.name}\"" }}]"
 	}
 
 	/**
@@ -98,7 +98,7 @@ class CompetitionController {
 	 */
 	@RequestMapping(value=["/actions"], method=[RequestMethod.GET])
 	fun getActionLog(): String {
-		return "[${this.actionLog.joinToString(",")}]"
+		return "[${this.actionLog.joinToString(",") { "\"$it\"" }}]"
 	}
 
 	/**
