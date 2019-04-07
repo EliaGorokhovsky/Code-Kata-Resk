@@ -143,4 +143,33 @@ class World(val size: Int, colors: Array<ReskColor>) {
 		return true
 	}
 
+	/**
+	 * Uses two card cash to inspire an insurgency of 10 unowned troops on any given tile
+	 * If an insurgency is inspired on an owned tile, it would be as if the tile was under attack by 10 unowned troops
+	 * Returns success of using card cash to inspire insurgency
+	 */
+	@Synchronized fun cardInspireInsurgency(tileId: Int): Boolean {
+		val cardCashAmount = this.cardCashValues[this.currentActor]!!
+		if (cardCashAmount < 2) {
+			return false
+		}
+		this.cardCashValues[this.currentActor] = cardCashAmount - 2
+		this.nodes[tileId].addTroops(Troops(null, 10))
+		return true
+	}
+
+	/**
+	 * Uses four card cash to remove all connections that connect the tile of the given ID
+	 * Returns success of using card cash to disconnect tile
+	 */
+	@Synchronized fun cardDisconnect(tileId: Int): Boolean {
+		val cardCashAmount = this.cardCashValues[this.currentActor]!!
+		if (cardCashAmount < 4) {
+			return false
+		}
+		this.cardCashValues[this.currentActor] = cardCashAmount - 4
+		this.connections.removeIf { it.connects(tileId) != null }
+		return true
+	}
+
 }
