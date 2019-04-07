@@ -22,7 +22,7 @@ class CompetitionController {
 	 */
 	@RequestMapping(value=["/teams/order"], method=[RequestMethod.GET])
 	fun getPlayerOrder(): String {
-		return "[${this.world.colors.joinToString(",") { it.name }}]"
+		return "[${this.world.players.joinToString(",") { it.name }}]"
 	}
 
 	/**
@@ -39,7 +39,7 @@ class CompetitionController {
 	 */
 	@RequestMapping(value=["/teams/territories"], method=[RequestMethod.GET])
 	fun getTerritoriesFor(@RequestParam teamColor: String): String {
-		val color = this.world.colors.firstOrNull { it.name == teamColor } ?: return "null"
+		val color = this.world.players.firstOrNull { it.name == teamColor } ?: return "null"
 		return "[${this.world.territoriesOwnedBy(color).joinToString(",")}]"
 	}
 
@@ -84,13 +84,22 @@ class CompetitionController {
 		return "${this.world.commitNewTroops(locationId, amount)}"
 	}
 
+	@RequestMapping(value=["/troops/move"], method=[RequestMethod.POST])
+	fun moveTroops(@RequestParam teamPassword: String, @RequestParam fromId: Int, @RequestParam toId: Int, @RequestParam amount: Int): String {
+		val team = getColorOfKey(teamPassword) ?: return "null"
+		if (this.world.currentActor != team) {
+			return "null"
+		}
+		return "${this.world.queueTroopsMove(fromId, toId, amount)}"
+	}
+
 	/**
 	 * Gets the amount of available card cash for the team with the given name
 	 * If the given team color doesn't exist, null is returned
 	 */
 	@RequestMapping(value=["/cards/amount"], method=[RequestMethod.GET])
 	fun getAvailableCards(@RequestParam teamColor: String): String {
-		val color = this.world.colors.firstOrNull { it.name == teamColor } ?: return "null"
+		val color = this.world.players.firstOrNull { it.name == teamColor } ?: return "null"
 		return "${this.world.cardCashValues[color]}"
 	}
 

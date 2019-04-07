@@ -6,8 +6,11 @@ package com.fairviewcodeclub.resk.logic
  * World constructor takes in sidelength and the colors of the playing players
  * All methods are synchronized to prevent threading issues
  */
-class World(val size: Int, var colors: Array<ReskColor>) {
+class World(val size: Int, colors: Array<ReskColor>) {
 
+	var players = colors
+		@Synchronized get() = field
+		private set(value) { field = value }
 	//The nodes or tiles of the world
     val nodes = Array(this.size * this.size) { Node(it) }
 		@Synchronized get() = field
@@ -20,18 +23,21 @@ class World(val size: Int, var colors: Array<ReskColor>) {
 			}.toMutableSet()
 		@Synchronized get() = field
 	//A map of player colors to the amount of card cash they have; each player starts off with 6 default
-	val cardCashValues = this.colors.map { it to 6 }.toMap().toMutableMap()
+	val cardCashValues = colors.map { it to 6 }.toMap().toMutableMap()
 		@Synchronized get() = field
 
 	//How many turns this world has existed
 	var turnCount = 0
 		@Synchronized get() = field
+		private set(value) { field = value }
 	//The team whose turn it is right now
-	var currentActor = this.colors[0]
+	var currentActor = colors[0]
 		@Synchronized get() = field
+		private set(value) { field = value }
 	//How many troops the current actor still has to commit
 	var numberOfTroopsToCommit = 25
 		@Synchronized get() = field
+		private set(value) { field = value }
 	//What troop orders will execute at the end of the current turn
 	val troopOrders = mutableListOf<TroopOrder>()
 		@Synchronized get() = field
@@ -69,24 +75,34 @@ class World(val size: Int, var colors: Array<ReskColor>) {
 			this.troopOrders.clear()
 			this.nodes.filter { it.troops != null && it.troops!!.amount <= 0 }.forEach { it.troops = null }
 			fun incrementCurrentActor() {
-				this.currentActor = this.colors[(this.colors.indexOf(this.currentActor) + 1) % this.colors.size]
+				this.currentActor = this.players[(this.players.indexOf(this.currentActor) + 1) % this.players.size]
 			}
 			incrementCurrentActor()
-			if (this.currentActor == this.colors[0]) {
+			if (this.currentActor == this.players[0]) {
 				this.turnCount++
 			}
 			if (this.turnCount == 0) {
 				this.numberOfTroopsToCommit = 25
 			} else {
-				val eliminatedPlayers = this.colors.filter { this.territoriesOwnedBy(it).isEmpty() }
+				val eliminatedPlayers = this.players.filter { this.territoriesOwnedBy(it).isEmpty() }
 				while (eliminatedPlayers.contains(this.currentActor)) {
 					incrementCurrentActor()
 				}
-				this.colors = this.colors.filter { !eliminatedPlayers.contains(it) }.toTypedArray()
+				this.players = this.players.filter { !eliminatedPlayers.contains(it) }.toTypedArray()
 				this.numberOfTroopsToCommit = this.territoriesOwnedBy(this.currentActor).size
 			}
 		}
 		return true
+	}
+
+	/**
+	 * Adds a TroopOrder to move the given amount of troops from the fromId tile to the toId tile
+	 * Troops can only be moved to adjacent tiles or to other owned tiles
+	 * Returns success of queueing move order
+	 */
+	@Synchronized fun queueTroopsMove(fromId: Int, toId: Int, amount: Int): Boolean {
+		//TODO:
+		return false
 	}
 
 	/**
