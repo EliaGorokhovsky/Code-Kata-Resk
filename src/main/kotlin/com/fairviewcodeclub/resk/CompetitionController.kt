@@ -17,6 +17,8 @@ class CompetitionController {
 
 	//The world that each player in the competition play in
 	val world = World(25, ReskColor.values().toList().shuffled().toTypedArray())
+	//The log of actions that were taken
+	val actionLog = mutableListOf<String>()
 
 	/**
 	 * Returns whether the given tile ID is allowed
@@ -84,6 +86,22 @@ class CompetitionController {
 	}
 
 	/**
+	 * Gets an ordered list of every action taken in the form 'team action inputs'
+	 * Actions are
+	 * 	commit <location> <amount>
+	 * 	move <from> <to> <amount>
+	 * 	connect <tile1> <tile2>
+	 * 	insurgency <tile>
+	 * 	disconnect <tile>
+	 * 	end
+	 * The latest action is at the end.
+	 */
+	@RequestMapping(value=["/actions"], method=[RequestMethod.GET])
+	fun getActionLog(): String {
+		return "[${this.actionLog.joinToString(",")}]"
+	}
+
+	/**
 	 * Allows the team of the given password to commit troops to an owned tile if it is their turn
 	 * Returns null if the password is wrong or the team isn't allowed to commit troops yet or the tile ID is wrong or the amount is <= 0
 	 * Returns success of adding new troops
@@ -96,6 +114,9 @@ class CompetitionController {
 		if (this.world.currentActor != team || !this.isTileIdValid(locationId) || amount <= 0) {
 			return "null"
 		}
+		this.actionLog.add("$team commit $locationId $amount")
+		if (this.world.numberOfTroopsToCommit == 0)
+			this.actionLog.add("$team end")
 		return "${this.world.commitNewTroops(locationId, amount)}"
 	}
 
@@ -111,6 +132,7 @@ class CompetitionController {
 		if (this.world.currentActor != team || !this.isTileIdValid(fromId) || !this.isTileIdValid(toId) || amount <= 0) {
 			return "null"
 		}
+		this.actionLog.add("$team move $fromId $toId $amount")
 		return "${this.world.queueTroopsMove(fromId, toId, amount)}"
 	}
 
@@ -136,6 +158,7 @@ class CompetitionController {
 		if (this.world.currentActor != team || !this.isTileIdValid(tileId1) || !this.isTileIdValid(tileId2)) {
 			return "null"
 		}
+		this.actionLog.add("$team connect $tileId1 $tileId2")
 		return "${this.world.cardConnect(tileId1, tileId2)}"
 	}
 
@@ -151,6 +174,7 @@ class CompetitionController {
 		if (this.world.currentActor != team || !this.isTileIdValid(tileId)) {
 			return "null"
 		}
+		this.actionLog.add("$team insurgency $tileId")
 		return "${this.world.cardInspireInsurgency(tileId)}"
 	}
 
@@ -166,6 +190,7 @@ class CompetitionController {
 		if (this.world.currentActor != team || !this.isTileIdValid(tileId)) {
 			return "null"
 		}
+		this.actionLog.add("$team disconnect $tileId")
 		return "${this.world.cardDisconnect(tileId)}"
 	}
 
