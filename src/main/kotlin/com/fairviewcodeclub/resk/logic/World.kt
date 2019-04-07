@@ -55,7 +55,7 @@ class World(val size: Int, colors: Array<ReskColor>) {
 		if (amount > this.numberOfTroopsToCommit || amount == 0) {
 			return false
 		}
-		if (this.nodes[locationId].troops?.owner != this.currentActor || this.territoriesOwnedBy(this.currentActor).isEmpty() && !arrayOf(0, size - 1, size * (size - 1), size * size - 1).contains(locationId)) {
+		if (this.nodes[locationId].troops?.owner != this.currentActor && this.territoriesOwnedBy(this.currentActor).isNotEmpty() || this.territoriesOwnedBy(this.currentActor).isEmpty() && !arrayOf(0, size - 1, size * (size - 1), size * size - 1).contains(locationId)) {
 			return false
 		}
 		this.troopOrders.add(TroopOrder(-1, locationId, amount))

@@ -90,6 +90,10 @@ If the territory is owned by another player, this becomes an attack.
 The attacking player loses a number of troops equal to half of the size of the defending force (rounded down), and the defending player loses a number of troops equal to 3/4 of the size of the attacking force (rounded down).
 If all defending troops are killed and there are attacking troops remaining, the remaining troops move into the territory and capture it for the attacking side.
 
+```GET URL/troops/amount```
+
+Gets the amount of troops the current player has yet to commit.
+
 ```PUT URL/cards/connect - params(teamPassword: String, tileId1: Int, tileId2: Int)```
 
 Expends 1 card cash to create a connection between `tileId1` and `tileId2` provided the player owns both tiles.

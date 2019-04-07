@@ -138,6 +138,14 @@ class CompetitionController {
 	}
 
 	/**
+	 * Gets the amount of troops the current player still needs to commit
+	 */
+	@RequestMapping(value=["/troops/amount"], method=[RequestMethod.GET])
+	fun getNumberOfTroopsToCommit(): Int {
+		return this.world.numberOfTroopsToCommit
+	}
+
+	/**
 	 * Gets the amount of available card cash for the team with the given name
 	 * If the given team color doesn't exist, null is returned
 	 */
