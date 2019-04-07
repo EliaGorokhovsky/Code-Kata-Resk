@@ -16,7 +16,8 @@ import org.springframework.web.bind.annotation.RestController
 class CompetitionController {
 
 	//The world that each player in the competition play in
-	val world = World(25, ReskColor.values().toList().shuffled().toTypedArray())
+//	val world = World(25, ReskColor.values().toList().shuffled().toTypedArray()) TODO:
+	val world = World(25, arrayOf(ReskColor.BLUE, ReskColor.GREEN))
 	//The log of actions that were taken
 	val actionLog = mutableListOf<String>()
 
