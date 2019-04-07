@@ -17,9 +17,11 @@ class World(val size: Int, colors: Array<ReskColor>) {
 	//The paths between nodes: which tiles connect to which other tiles
     val connections = this.nodes
 			.flatMap { node ->
-				listOf(node.id + 1, node.id - 1, node.id + this.size, node.id - this.size)
-						.filter { 0 <= it && it < this.nodes.size * this.nodes.size }
-						.map { Connection(it, node.id) }
+				when {
+					node.id % this.size == 0 -> listOf(node.id + 1, node.id + this.size, node.id - this.size)
+					node.id % this.size == this.size - 1 -> listOf(node.id - 1, node.id + this.size, node.id - this.size)
+					else -> listOf(node.id + 1, node.id - 1, node.id + this.size, node.id - this.size)
+				}.filter { 0 <= it && it < this.size * this.size }.map { Connection(it, node.id) }
 			}.toMutableSet()
 		@Synchronized get() = field
 	//A map of player colors to the amount of card cash they have; each player starts off with 6 default
