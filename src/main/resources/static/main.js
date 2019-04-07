@@ -53,6 +53,30 @@ window.setInterval(async () => {
 		return [(col + 1) * screen.width / 27, (row + 1) * screen.height / 27];
 	};
 
+	const insurgencies = [];
+	const log = await JSON.parse(await (await fetch(`${window.location.href.split("?")[0]}/api/actions`)).text());
+	log.filter(line => line.startsWith("insurgency")).forEach(line => {
+		const tile = parseInt(line.split(" ")[1]);
+		if (!insurgencies.includes(tile)) {
+			insurgencies.push(tile);
+		}
+	});
+
+	for (i in insurgencies) {
+		let tile = insurgencies[i];
+		if (nodes[tile].color !== "white") {
+			continue;
+		}
+		let response = await (await fetch(`${window.location.href.split("?")[0]}/api/board/troops?id=${i}`)).text();
+		if (response === "null") {
+			continue;
+		}
+		let troops = await JSON.parse(response);
+		nodes[tile].color = "gray";
+		nodes[tile].numberOfTroops = troops.amount;
+	}
+
+	renderer.clearRect(0, 0, screen.width, screen.height);
 	for (i in nodes) {
 		const node = nodes[i];
 		for (j in node.connections) {
