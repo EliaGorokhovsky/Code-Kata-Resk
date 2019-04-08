@@ -200,7 +200,7 @@ class TestController {
     }
 
     /**
-     * Allows a team to spend 2 card cash to inspire an insurgency on a tile
+     * Allows a team to spend 4 card cash to inspire an insurgency on a tile
      * If the team password is wrong or the team is not yet allowed to play or the tile ID is wrong, null is returned
      * See documentation for World.inspireInsurgency
      * Success is returned as true; false is only returned if there is not enough money to inspire an insurgency

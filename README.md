@@ -53,7 +53,7 @@ This call will return a list of the IDs for all tiles that are connected to the 
 
 ```GET URL/api/board/troops - params(id: Int)```
 
-This call will return a Javascript object containing the owner of the territory with given ID and the number of troops in that territory.
+This call will return a JSON object containing the owner of the territory with given ID and the number of troops in that territory.
 Unowned territories have `owner: null` if they have troops, but will only return `null` if they are unoccupied. For example, an output might look like this: `{owner:YELLOW, amount:2}`.
 
 ```GET URL/api/actions```
@@ -88,13 +88,13 @@ Order of inputs is not important, as long as they are all in the call.
 ```POST URL/api/troops/move - params(teamPassword: String, fromId: Int, toId: Int, amount: Int)```
 
 Moves `amount` troops from the territory with ID `fromId` to the territory with ID `toId` provided that the two territories are connected and the territory with ID `fromId` is owned by the player with the given password.
-If the territory is owned by another player, this becomes an attack. 
+If the `toId` territory is owned by another player, this becomes an attack. 
 The attacking player loses a number of troops equal to half of the size of the defending force (rounded down), and the defending player loses a number of troops equal to 3/4 of the size of the attacking force (rounded down).
 If all defending troops are killed and there are attacking troops remaining, the remaining troops move into the territory and capture it for the attacking side.
 
 ```GET URL/api/troops/amount```
 
-Gets the amount of troops the current player has yet to commit.
+Gets the amount of troops the current player has yet to commit. A player's turn ends when they have committed all of their troops.
 
 ```PUT URL/api/cards/connect - params(teamPassword: String, tileId1: Int, tileId2: Int)```
 
@@ -102,7 +102,7 @@ Expends 1 card cash to create a connection between `tileId1` and `tileId2` provi
 
 ```POST URL/api/cards/inspireInsurgency - params(teamPassword: String, tileId: Int)```
 
-Expends 2 card cash to place 10 unowned troops on the territory with ID `tileId`. 
+Expends 4 card cash to place 10 unowned troops on the territory with ID `tileId`. 
 If the territory is owned, the unowned troops will instead attack the territory (in other words, the territory loses 7 troops, and if it becomes unowned any unowned troops remain.)
 
 ```PUT URL/api/cards/disconnect - params(teamPassword: String, tileId: Int)```
@@ -115,4 +115,6 @@ Each team can access a test environment where they are the only player.
 The test environment can be accessed using any of the above API calls with `URL/api` as `URL/test/api`.
 Any API call in a test environment needs to have `teamPassword` as a parameter, even if it doesn't do so in the documentation.
 A team can also reset its test environment using the call
-```POST URL/test/api - params(teamPassword: String)```
+```POST URL/test/api - params(teamPassword: String)```.
+
+If any issues are found, please let either Saurabh or Elia know so they can fix it. Have fun!
