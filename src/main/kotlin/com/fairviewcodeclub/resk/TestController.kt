@@ -43,7 +43,7 @@ class TestController {
      * Returns whether the given tile ID is allowed
      */
     private fun isTileIdValid(tileId: Int, teamPassword: String): Boolean {
-        return 0 <= tileId && tileId < this.worldHash[getColorOfKey(teamPassword)]!!.size * this.worldHash[getColorOfKey(teamPassword)]!!.size
+        return 0 <= tileId && tileId < this.worldHash[getColorOfKey(teamPassword)?: return false]!!.size * this.worldHash[getColorOfKey(teamPassword)]!!.size
     }
 
     /**
@@ -51,7 +51,7 @@ class TestController {
      */
     @RequestMapping(value=["/"], method=[RequestMethod.POST])
     fun reset(@RequestParam teamPassword: String): String {
-        this.worldHash[getColorOfKey(teamPassword)!!] = World(25, arrayOf(getColorOfKey(teamPassword)!!))
+        this.worldHash[getColorOfKey(teamPassword)?: return "null"] = World(25, arrayOf(getColorOfKey(teamPassword)!!))
         return "true"
     }
 
@@ -60,7 +60,7 @@ class TestController {
      */
     @RequestMapping(value=["/teams/order"], method=[RequestMethod.GET])
     fun getPlayerOrder(@RequestParam teamPassword: String): String {
-        return "[${this.worldHash[getColorOfKey(teamPassword)]!!.players.joinToString(",") { "\"${it.name}\"" }}]"
+        return "[${this.worldHash[getColorOfKey(teamPassword)?: return "null"]!!.players.joinToString(",") { "\"${it.name}\"" }}]"
     }
 
     /**
@@ -68,7 +68,7 @@ class TestController {
      */
     @RequestMapping(value=["/teams/current"], method=[RequestMethod.GET])
     fun getCurrentActor(@RequestParam teamPassword: String): String {
-        return this.worldHash[getColorOfKey(teamPassword)]!!.currentActor.name
+        return this.worldHash[getColorOfKey(teamPassword)?: return "null"]!!.currentActor.name
     }
 
     /**
@@ -77,7 +77,7 @@ class TestController {
      */
     @RequestMapping(value=["/teams/territories"], method=[RequestMethod.GET])
     fun getTerritoriesFor(@RequestParam teamPassword: String, @RequestParam teamColor: String): String {
-        val color = this.worldHash[getColorOfKey(teamPassword)]!!.players.firstOrNull { it.name == teamColor } ?: return "null"
+        val color = (this.worldHash[getColorOfKey(teamPassword)?: return "null"]!!).players.firstOrNull { it.name == teamColor } ?: return "null"
         return "[${this.worldHash[getColorOfKey(teamPassword)]!!.territoriesOwnedBy(color).joinToString(",")}]"
     }
 
@@ -85,8 +85,8 @@ class TestController {
      * Gets the total number of tiles in the world
      */
     @RequestMapping(value=["/board/size"], method=[RequestMethod.GET])
-    fun getBoardSize(@RequestParam teamPassword: String): Int {
-        return this.worldHash[getColorOfKey(teamPassword)]!!.nodes.size
+    fun getBoardSize(@RequestParam teamPassword: String): String {
+        return "${this.worldHash[getColorOfKey(teamPassword)?: return "null"]!!.nodes.size}"
     }
 
     /**
@@ -98,7 +98,7 @@ class TestController {
         if (!this.isTileIdValid(id, teamPassword)) {
             return "null"
         }
-        return "[${this.worldHash[getColorOfKey(teamPassword)]!!.getAdjacencies(id).joinToString(",")}]"
+        return "[${this.worldHash[getColorOfKey(teamPassword)?: return "null"]!!.getAdjacencies(id).joinToString(",")}]"
     }
 
     /**
@@ -110,7 +110,7 @@ class TestController {
         if (!this.isTileIdValid(id, teamPassword)) {
             return "null"
         }
-        return "${this.worldHash[getColorOfKey(teamPassword)]!!.nodes[id].troops}"
+        return "${this.worldHash[getColorOfKey(teamPassword)?: return "null"]!!.nodes[id].troops}"
     }
 
     /**
@@ -126,7 +126,7 @@ class TestController {
      */
     @RequestMapping(value=["/actions"], method=[RequestMethod.GET])
     fun getActionLog(@RequestParam teamPassword: String): String {
-        return "[${this.actionLogHash[getColorOfKey(teamPassword)]!!.joinToString(",") { "\"$it\"" }}]"
+        return "[${this.actionLogHash[getColorOfKey(teamPassword)?: return "null"]!!.joinToString(",") { "\"$it\"" }}]"
     }
 
     /**
@@ -179,7 +179,7 @@ class TestController {
      */
     @RequestMapping(value=["/cards/amount"], method=[RequestMethod.GET])
     fun getAvailableCards(@RequestParam teamPassword: String, @RequestParam teamColor: String): String {
-        val color = this.worldHash[getColorOfKey(teamPassword)]!!.players.firstOrNull { it.name == teamColor } ?: return "null"
+        val color = this.worldHash[getColorOfKey(teamPassword)?: return "null"]!!.players.firstOrNull { it.name == teamColor } ?: return "null"
         return "${this.worldHash[getColorOfKey(teamPassword)]!!.cardCashValues[color]}"
     }
 

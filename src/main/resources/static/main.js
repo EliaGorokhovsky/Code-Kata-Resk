@@ -24,24 +24,38 @@ window.onload = () => {
 };
 
 /**
+ * Gets window information
+ */
+let key = new URLSearchParams(window.location.search).get("teamPassword");
+let url = window.location.href.split("?")[0];
+let addendum = "";
+if (key) {
+	url = `${url}/test`;
+	addendum = `&teamPassword=${key}`;
+} else {
+	key = "";
+}
+url += "/api";
+
+/**
  * Repeatedly draws the game
  */
 async function main() {
-	const players = await JSON.parse(await (await fetch(`${window.location.href}/api/teams/order`)).text());
+	const players = await JSON.parse(await (await fetch(`${url}/teams/order?${addendum}`)).text());
 	const ownedTerritories = {};
 	for (i in players) {
 		const player = players[i];
-		ownedTerritories[player] = await JSON.parse(await (await fetch(`${window.location.href}/api/teams/territories?teamColor=${player}`)).text());
+		ownedTerritories[player] = await JSON.parse(await (await fetch(`${url}/teams/territories?teamColor=${player}${addendum}`)).text());
 	}
 
 	const nodes = [];
 
 	for (let i = 0; i < 25 * 25; i++) {
-		nodes.push({ id: i, color: "white", numberOfTroops: 0, connections: await JSON.parse(await (await fetch(`${window.location.href}/api/board/adjacencies?id=${i}`)).text()) });
+		nodes.push({ id: i, color: "white", numberOfTroops: 0, connections: await JSON.parse(await (await fetch(`${url}/board/adjacencies?id=${i}${addendum}`)).text()) });
 		let owner = Object.keys(ownedTerritories).find(color => ownedTerritories[color].includes(i));
 		if (owner) {
 			nodes[i].color = owner.toLowerCase();
-			nodes[i].numberOfTroops = (await JSON.parse(await (await fetch(`${window.location.href}/api/board/troops?id=${i}`)).text())).amount;
+			nodes[i].numberOfTroops = (await JSON.parse(await (await fetch(`${url}/board/troops?id=${i}${addendum}`)).text())).amount;
 		}
 	}
 
@@ -53,7 +67,7 @@ async function main() {
 	};
 
 	const insurgencies = [];
-	const log = await JSON.parse(await (await fetch(`${window.location.href}/api/actions`)).text());
+	const log = await JSON.parse(await (await fetch(`${url}/actions?${addendum}`)).text());
 	log.filter(line => line.split(" ").length === 3 && line.split(" ")[1] === "insurgency").forEach(line => {
 		const tile = parseInt(line.split(" ")[1]);
 		if (!insurgencies.includes(tile)) {
@@ -66,7 +80,7 @@ async function main() {
 		if (nodes[tile].color !== "white") {
 			continue;
 		}
-		let response = await (await fetch(`${window.location.href}/api/board/troops?id=${i}`)).text();
+		let response = await (await fetch(`${url}/board/troops?id=${i}${addendum}`)).text();
 		if (response === "null") {
 			continue;
 		}
