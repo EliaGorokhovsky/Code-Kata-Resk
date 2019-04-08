@@ -9,35 +9,17 @@ import org.springframework.web.bind.annotation.RestController
 
 /**
  * A controller that handles running test environments
+ * Is similar to competition controller, but each player gets their own world
+ * As such, every method requires a teamPassword parameter to determine which player is using the test environment
  */
 @RestController
 @RequestMapping(value=["/test/api"])
 class TestController {
 
-    //The world that each player in the competition play in
-    val redWorld = World(25, arrayOf(ReskColor.RED))
-    val greenWorld = World(25, arrayOf(ReskColor.GREEN))
-    val blueWorld = World(25, arrayOf(ReskColor.BLUE))
-    val yellowWorld = World(25, arrayOf(ReskColor.YELLOW))
-    //The log of actions that were taken
-    val redActionLog = mutableListOf<String>()
-    val greenActionLog = mutableListOf<String>()
-    val blueActionLog = mutableListOf<String>()
-    val yellowActionLog = mutableListOf<String>()
-    //Hashes colors to worlds
-    val worldHash = mutableMapOf(
-            ReskColor.RED to this.redWorld,
-            ReskColor.GREEN to this.greenWorld,
-            ReskColor.BLUE to this.blueWorld,
-            ReskColor.YELLOW to this.yellowWorld
-    )
-    //Hashes colors to action logs
-    val actionLogHash = mapOf(
-            ReskColor.RED to this.redActionLog,
-            ReskColor.GREEN to this.greenActionLog,
-            ReskColor.BLUE to this.blueActionLog,
-            ReskColor.YELLOW to this.yellowActionLog
-    )
+    //Maps colors to worlds
+    val worldHash = ReskColor.values().map { it to World(25, arrayOf(it)) }.toMap().toMutableMap()
+    //Maps colors to action logs
+    val actionLogHash = ReskColor.values().map { it to mutableListOf<String>() }.toMap()
 
     /**
      * Returns whether the given tile ID is allowed
