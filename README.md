@@ -39,6 +39,10 @@ You can access information about the board state and the game by using the follo
 
 This call will return the turn order as a list of team colors; for instance, the output `["YELLOW", "GREEN", "BLUE", "RED"]` means that the `YELLOW` team moves first, followed in this order by the other three.
  
+ ```GET URL/api/teams/current```
+ 
+ This call will return the team whose turn it is currently.
+ 
 ```GET URL/api/teams/territories - params(teamColor: String)```
 
 This call will return a list of territories owned by the given color (`YELLOW`, `BLUE`, `RED`, or `GREEN`) as a list of location IDs. 
@@ -46,7 +50,7 @@ A use of this call might look like this: `GET URL/api/teams/territories?teamColo
 
 ```GET URL/api/board/size```
 
-This call will return the total number of territories in the game.
+This call will return the number 625. Don't call this.
 
 ```GET URL/api/board/adjacencies - params(id: Int)```
 
