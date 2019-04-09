@@ -1,9 +1,9 @@
 # Code-Kata-Resk
-A multiplayer, bot-controlled game of Risk.
+A multiplayer, bot-controlled game of Risk. To run this game locally, ensure that you have git and gradle installed on your machine. After cloning this repository type `./gradlew bootRun` to host this locally. If you do not have permission to use `./gradlew`, use `sudo sh ./gradlew bootRun` instead.
 
 ## Game Description
 Code-Kata-Resk is a four-player game based on the board game Risk. 
-The goal is simple: to own as much territory as possible when the game ends after a certain number of turns (exact number is to be decided on during the competition). 
+The goal is simple: to own as much territory as possible when the game ends after 256 turns. 
 Players move in turns. On their turn, every player can commit a certain number of troops to their own territory, move troops around in their own territory, or attempt to conquer unowned territory or territory owned by other players. 
 We've also spiced up the game a little by adding cards: players earn card cash by expanding into new territories, and can expend card cash to do one of three things:
  * Connect two owned tiles so that troops can move between them in one turn;
@@ -14,21 +14,22 @@ The game is played on a grid of size 25x25 where each player starts in one of th
 Each tile is connected at first to all tiles directly adjacent to it (not diagonals), but can be connected to other tiles with the connect card.
 In order for each side to control their empire, they must call the API methods described below. 
 For the API, each team will make a team password or a key during the competition.
+A team wins by having the most territories at the end of the game.
 
 ### Board State
 
-Each territory on the board is indexed by number, starting at zero in the upper-left-hand corner and going right. This means that the `n`th row starts with the index `25(n + 1)`.
+Each territory on the board is indexed by number, starting at zero in the upper-left-hand corner and going right. This means that the `n`th row starts with the index `25n`.
 
 ## Graphics
 
-To see a graphical representation of the main competition, go to `URL` in your browser. 
-To see a live version of a test environment, go to `URL/test?teamPassword=TEAM_KEY` to see the test environment of the team of the given key. THE TEST ENVIRONMENT GRAPHICS ARE A WORK IN PROGRESS.
+To see a graphical representation of the main competition, go to `http://localhost:8080` in your browser. 
+To see a live version of a test environment, go to `http://localhost:8080/test/?teamPassword=TEAM_KEY` to see the test environment of the team of the given key.
 
 Be aware that the graphical environment is purely for entertainment reasons and shouldn't be used as an objective grasp as to what is going on: the graphical environment is EXTREMELY slow to update and takes time to reflect changes.
 
 ## Actions 
 
-The `URL` in the following examples is either `localhost:8080` or `code-kata-resk.herokuapp.com` depending on whether the game is hosted locally or in competition.
+The `URL` in the following examples is `http://localhost:8080`.
  
 ### Information
  
@@ -66,7 +67,7 @@ Actions are (brackets represent variable values, and won't show up in output.)
  * 	`insurgency <tile>` represents the usage of a card to either add 10 troops to `tile` if it is unowned or attack `tile` with 10 unowned troops otherwise.
  * 	`disconnect <tile>` represents the usage of a card to remove all connections from `tile`.
  * 	`end` represents the end of a player's turn.
-The latest action is at the end.
+The latest action is at the end. An ideal way to use the log is to parse which tiles have activity going on in them, and then query those tiles specifically to find out more accurate information.
 
 ```GET URL/api/cards/amount - params(teamColor: String)```
 

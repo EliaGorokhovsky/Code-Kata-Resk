@@ -52,6 +52,9 @@ class World(val size: Int, colors: Array<ReskColor>) {
 	 * Returns method success
 	 */
 	@Synchronized fun commitNewTroops(locationId: Int, amount: Int): Boolean {
+		if (this.turnCount > 256) {
+			return false
+		}
 		if (amount > this.numberOfTroopsToCommit || amount == 0) {
 			return false
 		}
