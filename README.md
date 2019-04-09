@@ -72,6 +72,10 @@ The latest action is at the end.
 
 This call will return the amount of available card cash for the team with the given color.
 
+```GET URL/api/troops/amount```
+
+Gets the amount of troops the current player has yet to commit. A player's turn ends when they have committed all of their troops.
+
 ### Actions
 
 Controlling troops and using cards is also done by API call as follows. 
@@ -91,10 +95,6 @@ Moves `amount` troops from the territory with ID `fromId` to the territory with 
 If the `toId` territory is owned by another player, this becomes an attack. 
 The attacking player loses a number of troops equal to half of the size of the defending force (rounded down), and the defending player loses a number of troops equal to 3/4 of the size of the attacking force (rounded down).
 If all defending troops are killed and there are attacking troops remaining, the remaining troops move into the territory and capture it for the attacking side.
-
-```GET URL/api/troops/amount```
-
-Gets the amount of troops the current player has yet to commit. A player's turn ends when they have committed all of their troops.
 
 ```PUT URL/api/cards/connect - params(teamPassword: String, tileId1: Int, tileId2: Int)```
 
