@@ -18,8 +18,10 @@ class TestController {
 
     //Maps colors to worlds
     val worldHash = ReskColor.values().map { it to World(25, arrayOf(it)) }.toMap().toMutableMap()
+		@Synchronized get() = field //TODO: this may be an undesirable way of doing things
     //Maps colors to action logs
     val actionLogHash = ReskColor.values().map { it to mutableListOf<String>() }.toMap()
+		@Synchronized get() = field //TODO: this may be an undesirable way of doing things
 
     /**
      * Returns whether the given tile ID is allowed

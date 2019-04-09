@@ -19,6 +19,7 @@ class CompetitionController {
 	val world = World(25, ReskColor.values().toList().shuffled().toTypedArray())
 	//The log of actions that were taken
 	val actionLog = mutableListOf<String>()
+		@Synchronized get() = field
 
 	/**
 	 * Returns whether the given tile ID is allowed
