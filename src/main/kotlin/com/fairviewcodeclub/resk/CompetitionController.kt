@@ -115,10 +115,15 @@ class CompetitionController {
 		if (this.world.currentActor != team || !this.isTileIdValid(locationId) || amount <= 0) {
 			return "null"
 		}
-		this.actionLog.add("$team commit $locationId $amount")
-		if (this.world.numberOfTroopsToCommit == 0)
+		val oldTurnCount = this.world.turnCount
+		val success = this.world.commitNewTroops(locationId, amount)
+		if (success) {
+			this.actionLog.add("$team commit $locationId $amount")
+		}
+		if (this.world.turnCount != oldTurnCount) {
 			this.actionLog.add("$team end")
-		return "${this.world.commitNewTroops(locationId, amount)}"
+		}
+		return "$success"
 	}
 
 	/**
@@ -133,8 +138,11 @@ class CompetitionController {
 		if (this.world.currentActor != team || !this.isTileIdValid(fromId) || !this.isTileIdValid(toId) || amount <= 0) {
 			return "null"
 		}
-		this.actionLog.add("$team move $fromId $toId $amount")
-		return "${this.world.queueTroopsMove(fromId, toId, amount)}"
+		val success = this.world.queueTroopsMove(fromId, toId, amount)
+		if (success) {
+			this.actionLog.add("$team move $fromId $toId $amount")
+		}
+		return "$success"
 	}
 
 	/**
@@ -167,8 +175,11 @@ class CompetitionController {
 		if (this.world.currentActor != team || !this.isTileIdValid(tileId1) || !this.isTileIdValid(tileId2)) {
 			return "null"
 		}
-		this.actionLog.add("$team connect $tileId1 $tileId2")
-		return "${this.world.cardConnect(tileId1, tileId2)}"
+		val success = this.world.cardConnect(tileId1, tileId2)
+		if (success) {
+			this.actionLog.add("$team connect $tileId1 $tileId2")
+		}
+		return "$success"
 	}
 
 	/**
@@ -183,8 +194,11 @@ class CompetitionController {
 		if (this.world.currentActor != team || !this.isTileIdValid(tileId)) {
 			return "null"
 		}
-		this.actionLog.add("$team insurgency $tileId")
-		return "${this.world.cardInspireInsurgency(tileId)}"
+		val success = this.world.cardInspireInsurgency(tileId)
+		if (success) {
+			this.actionLog.add("$team insurgency $tileId")
+		}
+		return "$success"
 	}
 
 	/**
@@ -199,8 +213,11 @@ class CompetitionController {
 		if (this.world.currentActor != team || !this.isTileIdValid(tileId)) {
 			return "null"
 		}
-		this.actionLog.add("$team disconnect $tileId")
-		return "${this.world.cardDisconnect(tileId)}"
+		val success = this.world.cardDisconnect(tileId)
+		if (success) {
+			this.actionLog.add("$team disconnect $tileId")
+		}
+		return "$success"
 	}
 
 }
