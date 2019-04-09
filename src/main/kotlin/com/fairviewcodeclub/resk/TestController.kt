@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController
  * A controller that handles running test environments
  * Is similar to competition controller, but each player gets their own world
  * As such, every method requires a teamPassword parameter to determine which player is using the test environment
+ * The code in here is absolutely disgusting and has been created by a horrendous use of search and replace, so look in competition controller for better code
  */
 @RestController
 @RequestMapping(value=["/test/api"])
@@ -110,7 +111,7 @@ class TestController {
      */
     @RequestMapping(value=["/actions"], method=[RequestMethod.GET])
     fun getActionLog(@RequestParam teamPassword: String): String {
-        return "[${this.actionLogHash[getColorOfKey(teamPassword)?: return "null"]!!.joinToString(",") { "\"$it\"" }}]"
+        return "[${this.actionLogHash.getValue(getColorOfKey(teamPassword)?: return "null").joinToString(",") { "\"$it\"" }}]"
     }
 
     /**
@@ -126,10 +127,15 @@ class TestController {
         if (this.worldHash[getColorOfKey(teamPassword)]!!.currentActor != team || !this.isTileIdValid(locationId, teamPassword) || amount <= 0) {
             return "null"
         }
-        this.actionLogHash[getColorOfKey(teamPassword)]!!.add("$team commit $locationId $amount")
-        if (this.worldHash[getColorOfKey(teamPassword)]!!.numberOfTroopsToCommit == 0)
-            this.actionLogHash[getColorOfKey(teamPassword)]!!.add("$team end")
-        return "${this.worldHash[getColorOfKey(teamPassword)]!!.commitNewTroops(locationId, amount)}"
+		val oldTurnCount = this.worldHash[getColorOfKey(teamPassword)]!!.turnCount
+		val success = this.worldHash[getColorOfKey(teamPassword)]!!.commitNewTroops(locationId, amount)
+		if (success) {
+			this.actionLogHash[getColorOfKey(teamPassword)]!!.add("$team commit $locationId $amount")
+		}
+		if (this.worldHash[getColorOfKey(teamPassword)]!!.turnCount != oldTurnCount) {
+			this.actionLogHash[getColorOfKey(teamPassword)]!!.add("$team end")
+		}
+		return "$success"
     }
 
     /**
@@ -144,8 +150,11 @@ class TestController {
         if (this.worldHash[getColorOfKey(teamPassword)]!!.currentActor != team || !this.isTileIdValid(fromId, teamPassword) || !this.isTileIdValid(toId, teamPassword) || amount <= 0) {
             return "null"
         }
-        this.actionLogHash[getColorOfKey(teamPassword)]!!.add("$team move $fromId $toId $amount")
-        return "${this.worldHash[getColorOfKey(teamPassword)]!!.queueTroopsMove(fromId, toId, amount)}"
+		val success = this.worldHash[getColorOfKey(teamPassword)]!!.queueTroopsMove(fromId, toId, amount)
+		if (success) {
+			this.actionLogHash[getColorOfKey(teamPassword)]!!.add("$team move $fromId $toId $amount")
+		}
+		return "$success"
     }
 
 	/**
@@ -179,8 +188,11 @@ class TestController {
         if (this.worldHash[getColorOfKey(teamPassword)]!!.currentActor != team || !this.isTileIdValid(tileId1, teamPassword) || !this.isTileIdValid(tileId2, teamPassword)) {
             return "null"
         }
-        this.actionLogHash[getColorOfKey(teamPassword)]!!.add("$team connect $tileId1 $tileId2")
-        return "${this.worldHash[getColorOfKey(teamPassword)]!!.cardConnect(tileId1, tileId2)}"
+		val success = this.worldHash[getColorOfKey(teamPassword)]!!.cardConnect(tileId1, tileId2)
+		if (success) {
+			this.actionLogHash[getColorOfKey(teamPassword)]!!.add("$team connect $tileId1 $tileId2")
+		}
+		return "$success"
     }
 
     /**
@@ -195,8 +207,11 @@ class TestController {
         if (this.worldHash[getColorOfKey(teamPassword)]!!.currentActor != team || !this.isTileIdValid(tileId, teamPassword)) {
             return "null"
         }
-        this.actionLogHash[getColorOfKey(teamPassword)]!!.add("$team insurgency $tileId")
-        return "${this.worldHash[getColorOfKey(teamPassword)]!!.cardInspireInsurgency(tileId)}"
+		val success = this.worldHash[getColorOfKey(teamPassword)]!!.cardInspireInsurgency(tileId)
+		if (success) {
+			this.actionLogHash[getColorOfKey(teamPassword)]!!.add("$team insurgency $tileId")
+		}
+		return "$success"
     }
 
     /**
@@ -211,8 +226,11 @@ class TestController {
         if (this.worldHash[getColorOfKey(teamPassword)]!!.currentActor != team || !this.isTileIdValid(tileId, teamPassword)) {
             return "null"
         }
-        this.actionLogHash[getColorOfKey(teamPassword)]!!.add("$team disconnect $tileId")
-        return "${this.worldHash[getColorOfKey(teamPassword)]!!.cardDisconnect(tileId)}"
+		val success = this.worldHash[getColorOfKey(teamPassword)]!!.cardDisconnect(tileId)
+		if (success) {
+			this.actionLogHash[getColorOfKey(teamPassword)]!!.add("$team disconnect $tileId")
+		}
+		return "$success"
     }
 
 }
